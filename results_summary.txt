@@ -1,0 +1,37 @@
+======================================================================
+ML-AUGMENTED AUDIT vs BASE PAPER FIXED-THRESHOLD RULE
+======================================================================
+
+Fixed interval threshold used by baseline: 10 seconds
+
+-- Overall attack detection (all attack types pooled) --
+[BASELINE]
+  Precision              : 0.987
+  Recall                 : 0.386
+  F1 score               : 0.554
+  False-flag rate (legit): 0.0007
+
+[ML]
+  Precision              : 0.629
+  Recall                 : 0.543
+  F1 score               : 0.583
+  False-flag rate (legit): 0.0420
+  ROC-AUC (risk score)   : 0.959
+  PR-AUC  (risk score)   : 0.604
+
+-- Per attack-type flag rate (the key result) --
+             baseline_flag_rate  ml_flag_rate  ml_mean_risk_score
+user_type                                                        
+legit                    0.0007        0.0420              0.1615
+slow_low                 0.0000        0.2721              0.4564
+enumeration              0.9463        0.9313              0.5817
+burst                    0.9933        1.0000              0.7566
+
+Interpretation: the baseline's fixed 10s-interval rule flags
+'slow_low' attackers (paced just above the threshold) at a rate
+close to zero, because each individual request legitimately
+satisfies (now - last) >= interval. The ML model instead looks at
+aggregate behaviour (request volume, keyword diversity, policy-fail
+rate) over a rolling window, so it assigns this attacker a
+substantially higher risk score than ordinary users even though no
+single request would trip the paper's rule.
